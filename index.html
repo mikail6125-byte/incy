@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Шрифты (распознаются и латиница, и кириллица) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ========================================================================
+   СТИЛИ. Это «движок» внешнего вида. Менять тут НЕ обязательно.
+   Цвет акцента задаётся ниже в блоке CONFIG (поле accent) — он подставится
+   сюда автоматически. Если хочешь — можешь поиграться со значениями.
+   ======================================================================== */
+:root{
+  --bg:#0A0B0D;
+  --surface:rgba(255,255,255,0.035);
+  --surface-2:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.09);
+  --text:#ECEEF1;
+  --muted:#969CA6;
+  --accent:#2BE08A;              /* перезапишется из CONFIG.accent */
+  --accent-ink:#04140C;          /* цвет текста на акцентных кнопках */
+  --radius:18px;
+  --maxw:1140px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Manrope',system-ui,sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* атмосферные свечения на фоне */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(60vw 60vw at 75% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(50vw 50vw at 0% 30%, rgba(80,120,255,0.08), transparent 55%);
+}
+/* лёгкое «зерно», чтобы фон не был плоским */
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+h1,h2,h3,.brand{font-family:'Unbounded',sans-serif;line-height:1.08;letter-spacing:-.01em}
+.accent{color:var(--accent)}
+a{color:inherit;text-decoration:none}
+
+/* ---- Шапка ---- */
+header{
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid transparent;transition:.25s;
+}
+header.scrolled{
+  background:rgba(10,11,13,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-weight:800;font-size:22px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px var(--accent)}
+.nav-links{display:flex;gap:30px;font-size:15px;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+@media(max-width:760px){.nav-links{display:none}}
+
+/* ---- Кнопки ---- */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  padding:13px 24px;border-radius:999px;font-weight:600;font-size:15px;
+  cursor:pointer;border:1px solid transparent;transition:.2s;white-space:nowrap;
+}
+.btn-primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 8px 30px color-mix(in srgb, var(--accent) 35%, transparent)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px color-mix(in srgb, var(--accent) 45%, transparent)}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-2);border-color:color-mix(in srgb, var(--accent) 40%, var(--border))}
+
+/* ---- Hero ---- */
+.hero{padding:90px 0 70px;text-align:center}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:999px;font-size:13.5px;color:var(--muted);
+  background:var(--surface);border:1px solid var(--border);margin-bottom:30px;
+}
+.badge .pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.hero h1{font-size:clamp(40px,7vw,76px);font-weight:800;margin-bottom:22px}
+.hero p.sub{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:620px;margin:0 auto 38px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:56px}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px 26px;min-width:150px;
+}
+.stat b{display:block;font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700}
+.stat span{font-size:13.5px;color:var(--muted)}
+
+/* ---- Секции ---- */
+section.block{padding:70px 0}
+.section-head{text-align:center;max-width:600px;margin:0 auto 50px}
+.section-head h2{font-size:clamp(28px,4vw,44px);font-weight:700;margin-bottom:14px}
+.section-head p{color:var(--muted);font-size:17px}
+.grid{display:grid;gap:18px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid-3{grid-template-columns:1fr}}
+
+/* карточки фич */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:30px 26px;transition:.25s;
+}
+.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb, var(--accent) 45%, var(--border));background:var(--surface-2)}
+.card .ic{font-size:30px;margin-bottom:16px}
+.card h3{font-size:19px;font-weight:600;margin-bottom:10px;font-family:'Manrope',sans-serif}
+.card p{color:var(--muted);font-size:15px}
+
+/* карточки серверов */
+.srv{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px;transition:.25s;
+}
+.srv:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--border))}
+.srv-top{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+.srv-top .flag{font-size:28px}
+.srv-top h3{font-size:20px;font-weight:700;font-family:'Manrope',sans-serif}
+.srv .cities{color:var(--muted);font-size:14px;margin-bottom:20px}
+.srv-metrics{display:flex;gap:22px;margin-bottom:18px}
+.srv-metrics .m b{font-family:'Unbounded',sans-serif;font-size:20px;color:var(--accent)}
+.srv-metrics .m span{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.online{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.online::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+/* FAQ */
+.faq{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+details{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:0 24px;transition:.2s;
+}
+details[open]{background:var(--surface-2);border-color:color-mix(in srgb, var(--accent) 35%, var(--border))}
+summary{
+  list-style:none;cursor:pointer;padding:22px 0;font-weight:600;font-size:17px;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:24px;color:var(--accent);transition:.2s;font-weight:400}
+details[open] summary::after{transform:rotate(45deg)}
+details .ans{padding:0 0 22px;color:var(--muted);font-size:15.5px}
+
+/* CTA band */
+.cta-band{
+  text-align:center;margin:30px auto;max-width:var(--maxw);
+  background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, var(--surface)), var(--surface));
+  border:1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius:26px;padding:64px 28px;
+}
+.cta-band h2{font-size:clamp(26px,4vw,40px);font-weight:700;margin-bottom:26px}
+
+/* footer */
+footer{border-top:1px solid var(--border);margin-top:40px;padding:40px 0;text-align:center;color:var(--muted);font-size:14px}
+footer .brand{justify-content:center;margin-bottom:14px;font-size:19px}
+
+/* появление при загрузке/прокрутке */
+.reveal{opacity:0;transform:translateY(20px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- Разметка пустая: тексты подставит скрипт из CONFIG. Менять тут не нужно. -->
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="dot"></span><span id="brandName"></span></div>
+    <nav class="nav-links">
+      <a href="#features">Возможности</a>
+      <a href="#servers">Серверы</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-primary" id="navCta" href="#"></a>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="badge reveal"><span class="pulse"></span><span id="heroBadge"></span></div>
+    <h1 class="reveal" id="heroTitle"></h1>
+    <p class="sub reveal" id="heroSub"></p>
+    <div class="hero-cta reveal">
+      <a class="btn btn-primary" id="ctaPrimary" href="#"></a>
+      <a class="btn btn-ghost" id="ctaSecondary" href="#"></a>
+    </div>
+    <div class="stats" id="heroStats"></div>
+  </section>
+
+  <section class="block wrap" id="features">
+    <div class="section-head reveal">
+      <h2 id="featTitle"></h2>
+      <p id="featSub"></p>
+    </div>
+    <div class="grid grid-3" id="featuresGrid"></div>
+  </section>
+
+  <section class="block wrap" id="servers">
+    <div class="section-head reveal">
+      <h2 id="srvTitle"></h2>
+      <p id="srvSub"></p>
+    </div>
+    <div class="grid grid-3" id="serversGrid"></div>
+  </section>
+
+  <section class="block wrap" id="faq">
+    <div class="section-head reveal">
+      <h2 id="faqTitle"></h2>
+      <p id="faqSub"></p>
+    </div>
+    <div class="faq" id="faqList"></div>
+  </section>
+
+  <section class="block">
+    <div class="cta-band reveal">
+      <h2 id="ctaBandTitle"></h2>
+      <a class="btn btn-primary" id="ctaBandBtn" href="#"></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span id="footBrand"></span></div>
+    <p id="footNote"></p>
+    <p style="margin-top:8px">© <span id="year"></span> <span id="footBrand2"></span></p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================================
+   👇 ЭТО ЕДИНСТВЕННОЕ МЕСТО, КОТОРОЕ ТЫ РЕДАКТИРУЕШЬ 👇
+   Чтобы сделать новый сайт-переходник: скопируй весь файл, поменяй значения
+   ниже (тексты в кавычках, ссылку, цвет) — и всё. Разметку и стили выше не трогай.
+   ============================================================================ */
+const CONFIG = {
+
+  /* Название бренда (видно в шапке, подвале, вкладке браузера) */
+  brand: "Incy",
+
+  /* Куда ведут ВСЕ кнопки. Это твой Telegram-бот.
+     ?start=incyvps — метка источника: по ней в Bedolaga ты увидишь, что человек
+     пришёл именно с этого сайта. Для следующих сайтов меняй хвостик
+     (например incyvps2, incyvps3) — так разделишь статистику по каждому переходнику. */
+  botLink: "https://t.me/orb1taonline_bot?start=incyvps",
+
+  /* Цвет акцента всего сайта. Поменяй одну строку — перекрасится весь сайт.
+     Примеры: "#2BE08A" (мятный), "#38BDF8" (голубой), "#FF6B5B" (коралл), "#C7F94F" (лайм) */
+  accent: "#2BE08A",
+
+  /* Заголовок вкладки и описание для поисковиков */
+  seo: {
+    title: "Incy — быстрый доступ к интернету без ограничений",
+    description: "Incy — сервис для быстрого и стабильного доступа к интернету. Работает там, где не работают другие. Безлимит, серверы в нескольких странах."
+  },
+
+  /* Первый экран */
+  hero: {
+    badge: "Новый сервис — уже в строю",
+    /* заголовок собирается так: [start] [выделенное слово] [end] */
+    titleStart: "Интернет ",
+    titleAccent: "без границ",
+    titleEnd: " и тормозов",
+    subtitle: "Incy открывает доступ к любимым сайтам и сервисам там, где остальные уже не справляются. Подключение за минуту — прямо в Telegram.",
+    ctaPrimary: "Получить доступ",
+    ctaSecondary: "Попробовать бесплатно",
+    stats: [
+      { value: "5 стран", label: "серверы по миру" },
+      { value: "Безлимит", label: "трафик и скорость" },
+      { value: "24/7", label: "работает без выходных" }
+    ]
+  },
+
+  /* Блок «Возможности» */
+  features: {
+    title: "Почему Incy",
+    subtitle: "Современные технологии для скорости и стабильности",
+    items: [
+      { icon: "⚡", title: "Высокая скорость", text: "Оптимизированные серверы дают полную скорость без потери качества — видео, игры, звонки." },
+      { icon: "🛡", title: "Работает где надо", text: "Стабильное подключение даже там, где обычные сервисы перестают открываться." },
+      { icon: "∞", title: "Без лимитов", text: "Никаких ограничений по трафику и скорости. Пользуйся столько, сколько нужно." },
+      { icon: "🔐", title: "Современный протокол", text: "Новое поколение шифрования — безопасно и незаметно для фильтров." },
+      { icon: "🌍", title: "Серверы в разных странах", text: "Несколько локаций для стабильного и быстрого соединения в любой ситуации." },
+      { icon: "🤫", title: "Приватность", text: "Строгая политика без логов. Твои данные остаются только твоими." }
+    ]
+  },
+
+  /* Блок «Серверы». Цифры — это оформление, ставь любые правдоподобные. */
+  servers: {
+    title: "Серверы Incy",
+    subtitle: "Быстрые узлы в ключевых локациях",
+    items: [
+      { flag: "🇷🇺", country: "Россия", cities: "Обход блокировок", ping: "6ms",  speed: "1 Гбит/с", uptime: "99.9%" },
+      { flag: "🇳🇱", country: "Нидерланды", cities: "Амстердам",     ping: "32ms", speed: "1 Гбит/с", uptime: "99.9%" },
+      { flag: "🇩🇪", country: "Германия", cities: "Франкфурт",       ping: "38ms", speed: "1 Гбит/с", uptime: "99.8%" },
+      { flag: "🇫🇮", country: "Финляндия", cities: "Хельсинки",       ping: "30ms", speed: "1 Гбит/с", uptime: "99.9%" },
+      { flag: "🇺🇸", country: "США",       cities: "Нью-Йорк",        ping: "120ms",speed: "1 Гбит/с", uptime: "99.7%" }
+    ]
+  },
+
+  /* Блок «Вопросы» (раскрывающийся список) */
+  faq: {
+    title: "Частые вопросы",
+    subtitle: "Коротко о главном",
+    items: [
+      { q: "Как начать пользоваться Incy?", a: "Нажми любую кнопку на сайте — откроется наш Telegram-бот. Внутри за пару минут получишь подключение и инструкцию." },
+      { q: "Есть ли ограничения по трафику?", a: "Нет. Трафик и скорость безлимитные на всех платных тарифах." },
+      { q: "На каких устройствах работает?", a: "На телефоне, компьютере и планшете — Windows, macOS, iOS, Android и Linux." },
+      { q: "Можно сначала попробовать бесплатно?", a: "Да, есть пробный период. Нажми «Попробовать бесплатно» — всё объяснит бот." },
+      { q: "Это безопасно?", a: "Да. Используется современное шифрование и политика без хранения логов." }
+    ]
+  },
+
+  /* Финальный призыв */
+  ctaBand: {
+    title: "Готов попробовать Incy?",
+    button: "Подключиться за минуту"
+  },
+
+  /* Подвал */
+  footer: {
+    note: "Incy — быстрый и стабильный доступ к интернету."
+  }
+};
+/* ============================================================================
+   👆 КОНЕЦ НАСТРОЕК. Ниже — код, который всё это «собирает». Не трогай. 👇
+   ============================================================================ */
+
+(function(){
+  const $ = id => document.getElementById(id);
+
+  // акцентный цвет на весь сайт
+  document.documentElement.style.setProperty('--accent', CONFIG.accent);
+
+  // вкладка браузера + описание
+  document.title = CONFIG.seo.title;
+  let meta = document.querySelector('meta[name="description"]');
+  if(!meta){ meta = document.createElement('meta'); meta.name='description'; document.head.appendChild(meta); }
+  meta.content = CONFIG.seo.description;
+
+  // бренд
+  $('brandName').textContent = CONFIG.brand;
+  $('footBrand').textContent = CONFIG.brand;
+  $('footBrand2').textContent = CONFIG.brand;
+  $('footNote').textContent = CONFIG.footer.note;
+  $('year').textContent = new Date().getFullYear();
+
+  // все кнопки -> бот
+  ['navCta','ctaPrimary','ctaBandBtn'].forEach(id=>$(id).href = CONFIG.botLink);
+  $('ctaSecondary').href = CONFIG.botLink;
+  $('navCta').textContent = CONFIG.hero.ctaPrimary;
+
+  // hero
+  $('heroBadge').textContent = CONFIG.hero.badge;
+  $('heroTitle').innerHTML = CONFIG.hero.titleStart +
+    '<span class="accent">'+CONFIG.hero.titleAccent+'</span>' + CONFIG.hero.titleEnd;
+  $('heroSub').textContent = CONFIG.hero.subtitle;
+  $('ctaPrimary').textContent = CONFIG.hero.ctaPrimary;
+  $('ctaSecondary').textContent = CONFIG.hero.ctaSecondary;
+  $('heroStats').innerHTML = CONFIG.hero.stats.map(s=>
+    `<div class="stat reveal"><b>${s.value}</b><span>${s.label}</span></div>`).join('');
+
+  // features
+  $('featTitle').textContent = CONFIG.features.title;
+  $('featSub').textContent = CONFIG.features.subtitle;
+  $('featuresGrid').innerHTML = CONFIG.features.items.map(f=>
+    `<div class="card reveal"><div class="ic">${f.icon}</div><h3>${f.title}</h3><p>${f.text}</p></div>`).join('');
+
+  // servers
+  $('srvTitle').textContent = CONFIG.servers.title;
+  $('srvSub').textContent = CONFIG.servers.subtitle;
+  $('serversGrid').innerHTML = CONFIG.servers.items.map(s=>
+    `<div class="srv reveal">
+       <div class="srv-top"><span class="flag">${s.flag}</span><h3>${s.country}</h3></div>
+       <div class="cities">${s.cities}</div>
+       <div class="srv-metrics">
+         <div class="m"><b>${s.ping}</b><span>пинг</span></div>
+         <div class="m"><b>${s.speed}</b><span>скорость</span></div>
+         <div class="m"><b>${s.uptime}</b><span>аптайм</span></div>
+       </div>
+       <div class="online">Онлайн</div>
+     </div>`).join('');
+
+  // faq
+  $('faqTitle').textContent = CONFIG.faq.title;
+  $('faqSub').textContent = CONFIG.faq.subtitle;
+  $('faqList').innerHTML = CONFIG.faq.items.map(f=>
+    `<details><summary>${f.q}</summary><div class="ans">${f.a}</div></details>`).join('');
+
+  // cta band
+  $('ctaBandTitle').textContent = CONFIG.ctaBand.title;
+  $('ctaBandBtn').textContent = CONFIG.ctaBand.button;
+
+  // шапка темнеет при прокрутке
+  const head = document.querySelector('header');
+  const onScroll = ()=> head.classList.toggle('scrolled', window.scrollY > 10);
+  onScroll(); window.addEventListener('scroll', onScroll);
+
+  // плавное появление блоков
+  const io = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transitionDelay = (i%6*60)+'ms';
+    io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
